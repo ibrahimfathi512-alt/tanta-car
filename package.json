@@ -1,7 +1,7 @@
 {
   "name": "tanta-car-management",
   "version": "1.0.0",
-  "description": "نظام إدارة تانكر للمناديب",
+  "description": "نظام إدارة تانكر للمناديب والطلبات",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
