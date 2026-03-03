@@ -1,10 +1,16 @@
 {
+  "name": "tancar",
+  "version": "1.0.0",
+  "main": "index.js",
   "dependencies": {
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "google-auth-library": "^10.5.0",
-    "google-spreadsheet": "^5.0.2",
+    "google-spreadsheet": "^3.3.0",
     "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
