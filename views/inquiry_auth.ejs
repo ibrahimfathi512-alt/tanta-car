@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأكيد الهوية | Talabat Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff5e00;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            padding: 15px;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 35px 25px; 
+            border-radius: 24px; 
+            width: 100%;
+            max-width: 400px; 
+            text-align: center; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .icon-header {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 94, 0, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            margin: 0 auto 20px;
+        }
+
+        h2 { margin: 0 0 10px; font-size: 1.5rem; color: var(--text); }
+        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px; }
+
+        .input-group { margin-bottom: 20px; text-align: right; }
+        label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1; padding-right: 5px; }
+
+        select, input { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            background: rgba(15, 23, 42, 0.6); 
+            color: white; 
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus { border-color: var(--primary); }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, var(--primary), #ff8533); 
+            border: none; 
+            color: white; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            font-size: 1.1rem;
+            cursor: pointer; 
+            margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(255, 94, 0, 0.3);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:active { transform: scale(0.98); }
+        button:hover { opacity: 0.9; }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="icon-header">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <h2>أمان الزون: <%= zone %></h2>
+        <p>يرجى اختيار المقر وإدخال كلمة المرور للمتابعة</p>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i> كلمة المرور غير صحيحة، حاول مرة أخرى.
+            </div>
+        <% } %>
+
+        <form action="/uploaded-inquiry-auth" method="POST">
+            <div class="input-group">
+                <label>مقر التحضير</label>
+                <select name="location" required>
+                    <option value="" disabled selected>اختر مقر التحضير...</option>
+                    <% locations.forEach(loc => { %> 
+                        <option value="<%= loc %>"><%= loc %></option> 
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>كلمة مرور الزون</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit">تأكيد الدخول</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="/dashboard" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">
+                <i class="fa-solid fa-arrow-right"></i> العودة للرئيسية
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

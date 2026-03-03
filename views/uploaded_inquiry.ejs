@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيانات الاستعلام - <%= location %></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #ff5e00;
+            --bg: #0f172a;
+            --card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            padding: 20px; 
+            margin: 0; 
+            line-height: 1.6;
+        }
+        
+        .header-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            padding: 20px;
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .header-info h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        .header-info p { margin: 5px 0 0; color: var(--text-dim); font-size: 0.9rem; }
+        
+        .header-btns { display: flex; gap: 10px; }
+
+        .controls { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+            background: var(--card); 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: 1px solid var(--border); 
+        }
+        .search-box { flex: 1; position: relative; min-width: 250px; }
+        .search-box input { 
+            width: 100%; 
+            padding: 12px 45px 12px 12px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            background: rgba(0,0,0,0.3); 
+            color: white; 
+            outline: none; 
+            font-size: 1rem;
+        }
+        .search-box i { position: absolute; right: 15px; top: 15px; color: var(--primary); }
+        
+        .filter-box select { 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            background: rgba(0,0,0,0.3); 
+            color: white; 
+            outline: none; 
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .table-container { 
+            overflow-x: auto; 
+            background: var(--card); 
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { 
+            background: rgba(255, 94, 0, 0.1); 
+            color: var(--primary); 
+            padding: 18px; 
+            text-align: center; 
+            font-size: 0.95rem; 
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        td { 
+            padding: 14px; 
+            text-align: center; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 0.9rem; 
+        }
+        tr:hover { background: rgba(255, 255, 255, 0.05); }
+
+        /* حالات الاستعلام حسب عمود StatusDesc */
+        .status-clean { color: var(--success); font-weight: bold; background: rgba(34, 197, 94, 0.1); border-radius: 8px; padding: 4px 12px; }
+        .status-unclean { color: var(--danger); font-weight: bold; background: rgba(239, 68, 68, 0.1); border-radius: 8px; padding: 4px 12px; }
+        
+        .btn {
+            text-decoration: none; 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-back { background: #334155; }
+        .btn-back:hover { background: #475569; transform: translateX(-5px); }
+        
+        .btn-excel { background: var(--success); }
+        .btn-excel:hover { opacity: 0.9; transform: scale(1.02); }
+
+        #noResults {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div class="header-info">
+            <h1><i class="fa-solid fa-building-circle-check"></i> استعلام المقر: <%= location %></h1>
+            <p><i class="fa-solid fa-location-dot"></i> المنطقة (Zone): <%= zone %> | إجمالي البيانات: <%= data.length %></p>
+        </div>
+        <div class="header-btns">
+            <button onclick="exportToExcel()" class="btn btn-excel">
+                <i class="fa-solid fa-file-excel"></i> تصدير Excel
+            </button>
+            <a href="/dashboard" class="btn btn-back">
+                <i class="fa-solid fa-house"></i> الرئيسية
+            </a>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="بحث بالاسم، الكود، الهاتف، أو اسم المشرف...">
+        </div>
+        
+        <div class="filter-box">
+            <select id="statusFilter" onchange="filterTable()">
+                <option value="all">جميع الحالات</option>
+                <option value="Clean">Clean (سليم)</option>
+                <option value="Un Clean">Un Clean (مرفوض)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="inquiryTable">
+            <thead>
+                <tr>
+                    <% headers.forEach(h => { %> 
+                        <th><%= h %></th> 
+                    <% }) %>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <% if (data.length > 0) { %>
+                    <% data.forEach(row => { %>
+                        <tr class="data-row">
+                            <% headers.forEach(h => { 
+                                let val = row.get(h) || "";
+                                let cellClass = "";
+                                if(val.trim() === "Clean") cellClass = "status-clean";
+                                if(val.trim() === "Un Clean") cellClass = "status-unclean";
+                            %>
+                                <td>
+                                    <% if(cellClass !== "") { %>
+                                        <span class="<%= cellClass %>"><%= val %></span>
+                                    <% } else { %>
+                                        <%= val %>
+                                    <% } %>
+                                </td>
+                            <% }) %>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="<%= headers.length %>" style="padding: 50px; color: var(--text-dim);">لا توجد بيانات مرتبطة بهذا المقر حالياً.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+        <div id="noResults">
+            <i class="fa-solid fa-circle-exclamation fa-2x"></i><br><br>
+            عذراً، لا توجد نتائج مطابقة لبحثك في بيانات هذا المقر.
+        </div>
+    </div>
+
+    <script>
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('.data-row');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const cells = Array.from(row.getElementsByTagName('td'));
+                
+                let rowStatus = "all";
+                for(let cell of cells) {
+                    const cellText = cell.innerText.trim();
+                    if(cellText === "Clean") { rowStatus = "Clean"; break; }
+                    if(cellText === "Un Clean") { rowStatus = "Un Clean"; break; }
+                }
+
+                const matchesSearch = text.includes(searchText);
+                const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            noResults.style.display = (visibleCount === 0 && rows.length > 0) ? "block" : "none";
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById("inquiryTable");
+            const rows = Array.from(table.querySelectorAll("tr"));
+            
+            // تصدير الصفوف المفلترة والظاهرة فقط
+            const visibleRows = rows.filter(row => row.style.display !== "none");
+            
+            const wb = XLSX.utils.book_new();
+            const ws_data = visibleRows.map(row => {
+                return Array.from(row.querySelectorAll("th, td")).map(cell => cell.innerText.trim());
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "نتائج_الاستعلام");
+            
+            const fileName = `استعلام_<%= location %>_${new Date().toLocaleDateString('ar-EG')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Analysis | Tanta Car Elite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tanta-orange: #ff5e00;
+            --main-dark: #0c0c0e;
+            --card-bg: rgba(23, 23, 26, 0.8);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-muted: #a1a1aa;
+            --success: #22c55e;
+            --warning: #f1c40f;
+            --danger: #ef4444;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--main-dark);
+            background-image: 
+                radial-gradient(circle at top right, rgba(255, 94, 0, 0.1), transparent 400px),
+                radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.05), transparent 400px);
+            color: #ffffff;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 20px 40px;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .nav-header {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            padding: 20px 35px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .nav-header h2 { margin: 0; font-size: 22px; font-weight: 900; }
+        
+        .back-btn {
+            text-decoration: none;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .back-btn:hover { 
+            background: var(--tanta-orange);
+            border-color: var(--tanta-orange);
+            transform: translateX(-5px);
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card:hover { 
+            border-color: var(--tanta-orange);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .stat-card h4 { color: var(--text-muted); margin: 0; font-size: 14px; font-weight: 600; z-index: 2; }
+        .stat-card h2 { margin: 12px 0 0 0; font-size: 36px; font-weight: 900; z-index: 2; }
+        .stat-card .unit { font-size: 16px; color: var(--text-muted); font-weight: 400; margin-right: 5px; }
+
+        .stat-card i {
+            position: absolute;
+            left: -15px;
+            bottom: -15px;
+            font-size: 90px;
+            opacity: 0.07;
+            color: var(--tanta-orange);
+            transform: rotate(-15deg);
+        }
+
+        /* Table Section */
+        .table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        
+        th {
+            background: rgba(255,255,255,0.04);
+            color: var(--tanta-orange);
+            padding: 22px;
+            font-size: 15px;
+            font-weight: 800;
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td { 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 1px solid rgba(255,255,255,0.03); 
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* Progress Visuals */
+        .progress-box { width: 180px; margin: 0 auto; }
+        .pct-label { 
+            display: block; 
+            font-size: 15px; 
+            font-weight: 900; 
+            margin-bottom: 8px; 
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 20px; 
+            transition: width 1.2s cubic-bezier(0.1, 0.5, 0.5, 1); 
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 10px 18px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 130px;
+            justify-content: center;
+        }
+
+        .bg-excellent { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .bg-good { background: rgba(241, 196, 15, 0.15); color: #facc15; border: 1px solid rgba(241, 196, 15, 0.3); }
+        .bg-poor { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        @media (max-width: 900px) {
+            body { padding: 15px; }
+            .nav-header { flex-direction: column; gap: 20px; padding: 25px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .progress-box { width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-header">
+        <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="width: 15px; height: 15px; border-radius: 50%; background: var(--tanta-orange); box-shadow: 0 0 20px var(--tanta-orange);"></div>
+            <h2>تحليل أداء الزون: <span style="color: var(--tanta-orange); text-transform: uppercase;"><%= zone %></span></h2>
+        </div>
+        <a href="/dashboard" class="back-btn">
+            <span>الرئيسية</span>
+            <i class="fa-solid fa-house-user"></i>
+        </a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" style="border-right: 5px solid #3498db;">
+            <i class="fa-solid fa-motorcycle"></i>
+            <h4>عدد المناديب </h4>
+            <h2 style="color: #3498db;">-- <span class="unit">طيار</span></h2>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-flag-checkered"></i>
+            <h4>التارجت اليومي المطلوب</h4>
+            <h2><%= cleanData(zoneData.get('normal Target')) %><span class="unit">ساعة</span></h2>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-chart-simple"></i>
+            <h4>متوسط الإنجاز الحالي</h4>
+            <h2><%= cleanData(zoneData.get('Average')) %><span class="unit">ساعة</span></h2>
+        </div>
+
+        <div class="stat-card" style="border-bottom: 5px solid var(--success);">
+            <i class="fa-solid fa-bolt"></i>
+            <h4>نسبة تحقيق الزون</h4>
+            <h2 style="color: var(--success);"><%= zoneData.get('Average %') %></h2>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fa-regular fa-calendar" style="margin-left: 8px;"></i>التاريخ</th>
+                    <th><i class="fa-regular fa-clock" style="margin-left: 8px;"></i>الساعات المسجلة</th>
+                    <th><i class="fa-solid fa-percent" style="margin-left: 8px;"></i>مؤشر الإنجاز</th>
+                    <th><i class="fa-solid fa-shield-heart" style="margin-left: 8px;"></i>تقييم اليوم</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% headers.forEach(h => { 
+                    if(h.includes('/')) { 
+                        let val = parseFloat(cleanData(zoneData.get(h))) || 0;
+                        let target = parseFloat(cleanData(zoneData.get('normal Target'))) || 1;
+                        let pct = (val / target * 100);
+                        
+                        let badgeClass, barColor, statusText, icon;
+
+                        if (pct >= 95) { badgeClass = 'bg-excellent'; barColor = 'var(--success)'; statusText = 'أداء ملكي'; icon = 'fa-crown'; }
+                        else if (pct >= 80) { badgeClass = 'bg-excellent'; barColor = '#4ade80'; statusText = 'ممتاز جداً'; icon = 'fa-thumbs-up'; }
+                        else if (pct >= 60) { badgeClass = 'bg-good'; barColor = 'var(--warning)'; statusText = 'مستقر'; icon = 'fa-check'; }
+                        else { badgeClass = 'bg-poor'; barColor = 'var(--danger)'; statusText = 'ضعيف'; icon = 'fa-circle-exclamation'; }
+                %>
+                <tr>
+                    <td style="color: var(--text-muted); font-weight: 700;"><%= h %></td>
+                    <td style="font-size: 19px; color: #fff;"><%= val %> <small style="font-size: 12px; opacity: 0.5;">HR</small></td>
+                    <td>
+                        <div class="progress-box">
+                            <span class="pct-label" style="color: <%= barColor %>;"><%= pct.toFixed(1) %>%</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= Math.min(pct, 100) %>%; background: <%= barColor %>; box-shadow: 0 0 10px <%= barColor %>66;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge <%= badgeClass %>">
+                            <i class="fa-solid <%= icon %>"></i>
+                            <%= statusText %>
+                        </span>
+                    </td>
+                </tr>
+                <% } }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <footer style="margin-top: 60px; padding-bottom: 30px; text-align: center; color: var(--text-muted); font-size: 13px; letter-spacing: 1px;">
+        <i class="fa-solid fa-code" style="margin-left: 10px; color: var(--tanta-orange);"></i> 
+        TANTA CAR ELITE ANALYTICS SYSTEM &copy; 2026
+    </footer>
+
+</body>
+</html>
